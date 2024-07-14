@@ -25,10 +25,9 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
-        pip install -e spike
     - name: Test with pytest
       run: |
-        pytest tests/ --cov=spike --cov-report=xml --junit-xml=junit.xml
+         PYTHONPATH="." pytest tests/ --cov=spike --cov-report=xml --junit-xml=junit.xml
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
