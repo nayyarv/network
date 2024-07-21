@@ -6,10 +6,13 @@ class Layer:
 	def forward(self, *args, **kwargs):
 		raise NotImplementedError()
 
+	def backwards(self, *args, **kwargs):
+		raise NotImplementedError()
+
 @attr.define
 class Dense:
-	weight: np.array
-	bias: np.array
+	weight: np.array  # of the form [N_in, N_out]
+	bias: np.array  # of the form [N_out]
 
 	@classmethod
 	def xavier_init(cls, num_inputs: int, num_outputs: int):
@@ -21,12 +24,27 @@ class Dense:
 	def forward(self, x: np.array):
 		"""
 		Args:
-			inputs: np.array of shape [N, feat_in]
+			inputs: np.array of shape [N, N_in]
 		"""
 		assert len(x.shape) == 2
 		assert x.shape[1] == self.weight.shape[0]
 
 		return x @ self.weight  + self.bias
+	
+	def backwards(self, dldy: np.array, x: np.array):
+		"""
+		Args:
+			dldy: tensor of form [N_batch, N_out]
+			x: input of form [N_batch, N_in]
+
+
+		Returns:
+			dldx: tensor of form [N_batch, N_in]
+		"""
+		dldx = dldy @ self.weight.T
+		dldw = x.T @ dldy
+		dldb = dldy.sum(axis=1)  # accumulate gradient across batches 
+
 
 
 @attr.define
